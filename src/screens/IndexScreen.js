@@ -1,30 +1,44 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { Context } from '../context/BlogContext';
 
-const IndexScreen = () => {
+const IndexScreen = ({ navigation }) => {
 
-    const { state, addBlogPost } = useContext(Context);
+    const { state, deleteBlogPost } = useContext(Context);
 
     return (
         <View style={styles.view}>
-            <Text style={styles.title}>Index Screen</Text>
-            <TouchableOpacity style={styles.button}
-                onPress={addBlogPost}
-            >
-                <Text style={styles.text}>Add Post</Text>
-            </TouchableOpacity>
             <FlatList
                 showsVerticalScrollIndicator={false}
                 data={state}
                 keyExtractor={(blogPost) => blogPost.title}
                 renderItem={({ item }) => {
-                    return <Text>{item.title}</Text>
+                    return (
+                        <TouchableOpacity onPress={() => navigation.navigate('Show', { id: item.id })}>
+                            <View style={styles.postView}>
+                                <TouchableOpacity onPress={() => deleteBlogPost(item.id)}>
+                                    <Feather style={styles.postIcon} name="trash" />
+                                </TouchableOpacity>
+                                <Text style={styles.postText}>{item.title}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )
                 }}
             />
         </View>
     );
-}
+};
+
+IndexScreen.navigationOptions = ({ navigation }) => {
+    return {
+        headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.navigate('Create')} style={styles.create}>
+                <Feather name="plus-square" size={35} />
+            </TouchableOpacity>
+        ),
+    };
+};
 
 const styles = StyleSheet.create({
     view: {
@@ -49,7 +63,38 @@ const styles = StyleSheet.create({
         fontSize: 26,
         letterSpacing: 4,
         fontWeight: 'bold'
+    },
+    postView: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderWidth: 0.2,
+        borderColor: 'lightgrey',
+        borderRadius: 4,
+        marginVertical: 5,
+    },
+    postText: {
+        fontSize: 25,
+        marginHorizontal: 10
+    },
+    postIcon: {
+        fontSize: 30,
+        marginHorizontal: 10,
+        borderWidth: 1,
+        borderColor: 'lightgrey',
+        borderRadius: 4,
+        width: 50,
+        textAlign: 'center',
+        lineHeight: 50,
+        marginVertical: 5
+    },
+    create: {
+        marginLeft: 10
     }
 });
 
 export default IndexScreen;
+
+
+
+
